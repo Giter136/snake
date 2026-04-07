@@ -3,6 +3,8 @@
 #include<vector>
 #include<ctime>
 #include<unordered_map>
+#define size_x 500
+#define size_y 500
 class item{
 public:
     item():item(0,0) {};
@@ -17,6 +19,18 @@ public:
     }
     bool collision(const item& itm){
         return this->m_x==itm.m_x && this->m_y==itm.m_y;
+    }
+    bool boardDectx1(){
+        return m_x>size_x;
+    }
+    bool boardDectx2(){
+        return m_x<0;
+    }
+    bool boardDecty1(){
+        return m_y>size_y;
+    }
+    bool boardDecty2(){
+        return m_y<0;
     }
 protected:
     int m_x;
@@ -85,6 +99,20 @@ public:
     void increase(){
         node.push_back(item());
     }
+    void boardSkip(){
+        if(node[0].boardDectx1()){
+            node[0].move(-size_x,0);
+        }
+        else if(node[0].boardDectx2()){
+            node[0].move(size_x,0);
+        }
+        else if(node[0].boardDecty1()){
+            node[0].move(0,-size_y);
+        }
+        else if(node[0].boardDecty2()){
+            node[0].move(0,size_y);
+        }
+    }
     BYTE dir;
 private:
     std::vector<item> node;//蛇身数组用于存储蛇身体节点位置
@@ -102,6 +130,7 @@ public:
         BeginBatchDraw();//这是什么东西？
         cleardevice();//这是什么东西？
         snk.moveBody();
+        snk.boardSkip();//先位移，再跳跃，再检测是否吃到食物
         snakeEatFood();
         fd.draw();
         snk.draw();
@@ -134,7 +163,7 @@ private:
 
 int main(){
     srand(time(0));
-    initgraph(500,500);
+    initgraph(size_x,size_y);
     game gm;//构建一个大的游戏类有什么好处吗？
     while(1){
         gm.run();
