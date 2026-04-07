@@ -21,13 +21,13 @@ public:
         return this->m_x==itm.m_x && this->m_y==itm.m_y;
     }
     bool boardDectx1(){
-        return m_x>size_x;
+        return m_x>size_x-1;
     }
     bool boardDectx2(){
         return m_x<0;
     }
     bool boardDecty1(){
-        return m_y>size_y;
+        return m_y>size_y-1;
     }
     bool boardDecty2(){
         return m_y<0;
