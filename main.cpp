@@ -3,8 +3,10 @@
 #include<vector>
 #include<ctime>
 #include<unordered_map>
+#include<string>
 #define size_x 500
 #define size_y 500
+
 class item{
 public:
     item():item(0,0) {};
@@ -113,7 +115,18 @@ public:
             node[0].move(0,size_y);
         }
     }
+    bool selfcollision(){
+        for(size_t i=node.size()-1;i>0;i--){
+            if(node[0].collision(node[i])){
+                return true;
+            }
+        }
+        return false;
+    }
     BYTE dir;
+    int getLength(){
+        return node.size();
+    }
 private:
     std::vector<item> node;//蛇身数组用于存储蛇身体节点位置
 };
@@ -129,11 +142,12 @@ public:
     void run(){
         BeginBatchDraw();//这是什么东西？
         cleardevice();//这是什么东西？
-        snk.moveBody();
+        snk.moveBody();//逻辑上移动
         snk.boardSkip();//先位移，再跳跃，再检测是否吃到食物
-        snakeEatFood();
-        fd.draw();
-        snk.draw();
+        dectEnd();
+        snakeEatFood();//检测吃到食物
+        fd.draw();//画出来食物
+        snk.draw();//画出移动后的蛇
         FlushBatchDraw();//把缓冲区画面真正显示到窗口
         ExMessage msg{};//创建一个消息对象.视频中使用={0}初始化，但是在我这会报错，暂时选择不初始化。
         while(peekmessage(&msg,EX_KEY)){//每一帧获取一次消息给msg对象,但是外面用的就是while true了，为什么这里选择使用while而不是if呢？
@@ -155,7 +169,21 @@ public:
             fd.changeposition();
         }
     }
+    void dectEnd(){
+        if(snk.selfcollision()){
+            isToEnd=true;
+        }
+    }
+    void end(){
+        setfillcolor(BLACK);
+        settextcolor(WHITE);
+        solidellipse(0,0,499,499);
+        settextstyle(50,0,_T("宋体"));
+        outtextxy(100,100,_T("Game Over!"));
+    }
+    bool isToEnd=false;
 private:
+    
     snake snk;
     food fd;
     std::unordered_map<BYTE,BYTE> um;
@@ -167,6 +195,10 @@ int main(){
     game gm;//构建一个大的游戏类有什么好处吗？
     while(1){
         gm.run();
+        if(gm.isToEnd){
+            gm.end();
+            break;
+        }
         Sleep(70);
     }
     return 0;
