@@ -181,6 +181,16 @@ public:
         settextstyle(50,0,_T("宋体"));
         outtextxy(100,100,_T("Game Over!"));
     }
+    void waitKey(){
+        ExMessage msg;
+        while(peekmessage(&msg,EX_KEY));
+        while(true){
+            getmessage(&msg,EX_KEY);
+            if(msg.message==WM_KEYDOWN){//啥意思
+                break;
+            }
+        }
+    }
     bool isToEnd=false;
 private:
     
@@ -197,6 +207,7 @@ int main(){
         gm.run();
         if(gm.isToEnd){
             gm.end();
+            gm.waitKey();
             break;
         }
         Sleep(70);
