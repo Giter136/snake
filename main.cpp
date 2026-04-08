@@ -1,12 +1,15 @@
 #include<iostream>
+#include<fstream>
 #include<easyx.h>
 #include<vector>
 #include<ctime>
 #include<unordered_map>
 #include<string>
+#include<algorithm>
+#include<cstdio>
 #define size_x 500
 #define size_y 500
-
+#define filename "bestscore.txt"
 class item{
 public:
     item():item(0,0) {};
@@ -138,6 +141,9 @@ public:
         um.insert(std::make_pair(VK_UP,VK_DOWN));
         um.insert(std::make_pair(VK_RIGHT,VK_LEFT));
         um.insert(std::make_pair(VK_LEFT,VK_RIGHT));
+        std::ifstream ifs(filename);
+        ifs>>bestscore;
+        ifs.close();
     }
     void run(){
         BeginBatchDraw();//这是什么东西？
@@ -175,25 +181,39 @@ public:
         }
     }
     void end(){
+        bestscore=std::max(bestscore,snk.getLength());
+        std::ofstream ofs(filename);
+        ofs<<bestscore;
+        ofs.close();
         setfillcolor(BLACK);
         settextcolor(WHITE);
-        solidellipse(0,0,499,499);
+        cleardevice();
+        TCHAR point[50];
+        TCHAR bestpoint[50];
+        _stprintf(point,_T("finallength:%d"),snk.getLength());
+        _stprintf(bestpoint,_T("bestlength:%d"),bestscore);
         settextstyle(50,0,_T("宋体"));
         outtextxy(100,100,_T("Game Over!"));
+        settextstyle(25,0,_T("宋体"));
+        outtextxy(100,200,point);
+        outtextxy(100,250,bestpoint);
+        settextstyle(20,0,_T("宋体"));
+        outtextxy(100,350,_T("tapping e to close the window"));
+        
     }
     void waitKey(){
         ExMessage msg;
         while(peekmessage(&msg,EX_KEY));
         while(true){
             getmessage(&msg,EX_KEY);
-            if(msg.message==WM_KEYDOWN){//啥意思
+            if(msg.message==WM_KEYDOWN&&msg.vkcode=='E'){//啥意思
                 break;
             }
         }
     }
     bool isToEnd=false;
 private:
-    
+    int bestscore;
     snake snk;
     food fd;
     std::unordered_map<BYTE,BYTE> um;
